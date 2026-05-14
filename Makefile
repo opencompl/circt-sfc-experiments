@@ -4,5 +4,5 @@ ZIPS := $(wildcard chipyard_zips/*.zip)
 unzip:
 	@for zip in $(ZIPS); do \
 		echo "Unzipping $$zip..."; \
-		unzip -o $$zip; \
+		unzip -o $$zip -d chipyard_benchmarks; \
 	done
