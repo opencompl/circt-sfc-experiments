@@ -19,6 +19,8 @@ FILES = [
 
 UNWANTED_CLASSES = [
     "chisel3.experimental.EnumAnnotations$EnumComponentAnnotation",
+    "chisel3.experimental.EnumAnnotations$EnumVecAnnotation",
+    "chisel3.experimental.EnumAnnotations$EnumDefAnnotation",
 ]
 
 for backup, output in FILES:
