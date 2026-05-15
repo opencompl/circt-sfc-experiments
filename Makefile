@@ -3,7 +3,12 @@ BENCHMARK_DIRS := $(wildcard chipyard_benchmarks/*)
 CIRCT_BENCHMARK_DIRS := $(patsubst chipyard_benchmarks/%,circt_benchmarks/%,$(BENCHMARK_DIRS))
 SFC_BENCHMARK_DIRS := $(patsubst chipyard_benchmarks/%,sfc_benchmarks/%,$(BENCHMARK_DIRS))
 
-.PHONY: untar clean circt_benchmarks sfc_benchmarks
+.PHONY: untar clean benchmarks
+benchmarks:
+	$(MAKE) untar
+	$(MAKE) circt_benchmarks
+	$(MAKE) sfc_benchmarks
+
 untar:
 	mkdir -p chipyard_benchmarks
 	@for tar in $(TARS); do \
