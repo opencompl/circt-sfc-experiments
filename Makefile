@@ -1,24 +1,32 @@
 TARS := $(wildcard chipyard_tars/*.tar.gz)
-BENCHMARK_DIRS := $(wildcard benchmarks/chipyard/*)
-CIRCT_BENCHMARK_DIRS := $(patsubst benchmarks/chipyard/%,benchmarks/circt/%,$(BENCHMARK_DIRS))
-SFC_BENCHMARK_DIRS := $(patsubst benchmarks/chipyard/%,benchmarks/sfc/%,$(BENCHMARK_DIRS))
+BENCHMARK_NAMES := $(patsubst chipyard_tars/%.tar.gz,%,$(TARS))
+CHIPYARD_DIRS := $(addprefix benchmarks/chipyard/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
+CIRCT_DIRS := $(addprefix benchmarks/circt/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
+SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 
-.PHONY: untar clean all
-all:
-	$(MAKE) untar
-	$(MAKE) benchmarks/circt
-	$(MAKE) benchmarks/sfc
+.PHONY: all verilog clean
 
-untar:
-	mkdir -p benchmarks/chipyard
-	@for tar in $(TARS); do \
-		echo "Unpacking $$tar..."; \
-		tar -xzf $$tar -C benchmarks/chipyard; \
+all: verilog
+
+benchmarks/chipyard: $(CHIPYARD_DIRS)
+benchmarks/circt: $(CIRCT_DIRS)
+benchmarks/sfc: $(SFC_DIRS)
+
+verilog: benchmarks/circt benchmarks/sfc
+	@find benchmarks/circt -name "*.fir" | while read fir; do \
+		echo "Running firtool on $$fir..."; \
+		firtool "$$fir" -o "$${fir%.fir}.sv"; \
+	done
+	@find benchmarks/sfc -name "*.fir" | while read fir; do \
+		echo "Running firrtl on $$fir..."; \
+		firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
 	done
 
-benchmarks/circt: $(CIRCT_BENCHMARK_DIRS)
+benchmarks/chipyard/chipyard.harness.TestHarness.%: chipyard_tars/%.tar.gz
+	mkdir -p benchmarks/chipyard
+	tar -xzf $< -C benchmarks/chipyard
 
-benchmarks/circt/%: benchmarks/chipyard/%
+benchmarks/circt/chipyard.harness.TestHarness.%: benchmarks/chipyard/chipyard.harness.TestHarness.%
 	mkdir -p benchmarks/circt
 	cp -r $< $@
 	@find $@ -name "*.anno.json" | while read f; do mv "$$f" "$$f.bak"; done
@@ -29,9 +37,7 @@ benchmarks/circt/%: benchmarks/chipyard/%
 		python3 utils/strip_annotations.py "$$prefix"; \
 	done
 
-benchmarks/sfc: $(SFC_BENCHMARK_DIRS)
-
-benchmarks/sfc/%: benchmarks/circt/%
+benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness.TestHarness.%
 	mkdir -p benchmarks/sfc
 	cp -r $< $@
 	@find $@ -name "*.fir" | while read f; do \
