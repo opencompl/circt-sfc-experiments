@@ -4,9 +4,12 @@ CHIPYARD_DIRS := $(addprefix benchmarks/chipyard/chipyard.harness.TestHarness.,$
 CIRCT_DIRS := $(addprefix benchmarks/circt/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 
-.PHONY: all verilog clean
+.PHONY: all verilog clean check-tools
 
-all: verilog
+check-tools:
+	@utils/check_tools.sh
+
+all: check-tools verilog
 
 benchmarks/chipyard: $(CHIPYARD_DIRS)
 benchmarks/circt: $(CIRCT_DIRS)
