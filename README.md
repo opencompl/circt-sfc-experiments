@@ -1,6 +1,6 @@
 # SFC vs. CIRCT FIRRTL compilation benchmarking (WIP)
 
-Benchmarks as found in Chipyard (by running `make CONFIG=<config>` in `sims/verilator`) can be found (in ZIP format) in `chipyard_zips`.
+Run `make` to generate a benchmark directory containing Verilog generated from the supported Chipyard benchmarks by both Firtool and SFC.
 
 TODO:
 - Small BOOM seems to need a higher character limit in FIRRTL version conversion
