@@ -1,25 +1,25 @@
 TARS := $(wildcard chipyard_tars/*.tar.gz)
-BENCHMARK_DIRS := $(wildcard chipyard_benchmarks/*)
-CIRCT_BENCHMARK_DIRS := $(patsubst chipyard_benchmarks/%,circt_benchmarks/%,$(BENCHMARK_DIRS))
-SFC_BENCHMARK_DIRS := $(patsubst chipyard_benchmarks/%,sfc_benchmarks/%,$(BENCHMARK_DIRS))
+BENCHMARK_DIRS := $(wildcard benchmarks/chipyard/*)
+CIRCT_BENCHMARK_DIRS := $(patsubst benchmarks/chipyard/%,benchmarks/circt/%,$(BENCHMARK_DIRS))
+SFC_BENCHMARK_DIRS := $(patsubst benchmarks/chipyard/%,benchmarks/sfc/%,$(BENCHMARK_DIRS))
 
-.PHONY: untar clean benchmarks
-benchmarks:
+.PHONY: untar clean all
+all:
 	$(MAKE) untar
-	$(MAKE) circt_benchmarks
-	$(MAKE) sfc_benchmarks
+	$(MAKE) benchmarks/circt
+	$(MAKE) benchmarks/sfc
 
 untar:
-	mkdir -p chipyard_benchmarks
+	mkdir -p benchmarks/chipyard
 	@for tar in $(TARS); do \
 		echo "Unpacking $$tar..."; \
-		tar -xzf $$tar -C chipyard_benchmarks; \
+		tar -xzf $$tar -C benchmarks/chipyard; \
 	done
 
-circt_benchmarks: $(CIRCT_BENCHMARK_DIRS)
+benchmarks/circt: $(CIRCT_BENCHMARK_DIRS)
 
-circt_benchmarks/%: chipyard_benchmarks/%
-	mkdir -p circt_benchmarks
+benchmarks/circt/%: benchmarks/chipyard/%
+	mkdir -p benchmarks/circt
 	cp -r $< $@
 	@find $@ -name "*.anno.json" | while read f; do mv "$$f" "$$f.bak"; done
 	@find $@ -name "*.fir" | while read f; do mv "$$f" "$$f.bak"; done
@@ -29,10 +29,10 @@ circt_benchmarks/%: chipyard_benchmarks/%
 		python3 utils/strip_annotations.py "$$prefix"; \
 	done
 
-sfc_benchmarks: $(SFC_BENCHMARK_DIRS)
+benchmarks/sfc: $(SFC_BENCHMARK_DIRS)
 
-sfc_benchmarks/%: circt_benchmarks/%
-	mkdir -p sfc_benchmarks
+benchmarks/sfc/%: benchmarks/circt/%
+	mkdir -p benchmarks/sfc
 	cp -r $< $@
 	@find $@ -name "*.fir" | while read f; do \
 		echo "Converting $$f..."; \
@@ -41,4 +41,4 @@ sfc_benchmarks/%: circt_benchmarks/%
 	done
 
 clean:
-	rm -rf chipyard_benchmarks circt_benchmarks sfc_benchmarks
+	rm -rf benchmarks
