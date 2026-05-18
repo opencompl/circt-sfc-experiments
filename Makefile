@@ -1,5 +1,9 @@
 TARS := $(wildcard chipyard_tars/*.tar.gz)
+ifdef BENCHMARK
+BENCHMARK_NAMES := $(BENCHMARK)
+else
 BENCHMARK_NAMES := $(patsubst chipyard_tars/%.tar.gz,%,$(TARS))
+endif
 CHIPYARD_DIRS := $(addprefix benchmarks/chipyard/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 CIRCT_DIRS := $(addprefix benchmarks/circt/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
