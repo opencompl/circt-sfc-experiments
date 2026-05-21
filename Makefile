@@ -20,13 +20,17 @@ benchmarks/circt: $(CIRCT_DIRS)
 benchmarks/sfc: $(SFC_DIRS)
 
 verilog: benchmarks/circt benchmarks/sfc
-	@find benchmarks/circt -name "*.fir" | while read fir; do \
-		echo "Running firtool on $$fir..."; \
-		firtool "$$fir" -o "$${fir%.fir}.sv"; \
+	@for dir in $(CIRCT_DIRS); do \
+		find "$$dir" -name "*.fir" | while read fir; do \
+			echo "Running firtool on $$fir..."; \
+			firtool "$$fir" -o "$${fir%.fir}.sv"; \
+		done; \
 	done
-	@find benchmarks/sfc -name "*.fir" | while read fir; do \
-		echo "Running firrtl on $$fir..."; \
-		firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
+	@for dir in $(SFC_DIRS); do \
+		find "$$dir" -name "*.fir" | while read fir; do \
+			echo "Running firrtl on $$fir..."; \
+			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
+		done; \
 	done
 
 benchmarks/chipyard/chipyard.harness.TestHarness.%: chipyard_tars/%.tar.gz
