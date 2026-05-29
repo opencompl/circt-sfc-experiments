@@ -3,6 +3,7 @@
 PATH_TO_UTILS=utils
 PATH_TO_TEMPLATES=$PATH_TO_UTILS/config_templates
 PATH_TO_OPENROAD_DEST=OpenROAD-flow-scripts/flow/designs/sky130hd
+TMP_DIR=$PWD/tmp
 
 # Check arguments  
 if [ "$#" -lt 2 ]; then
@@ -10,7 +11,7 @@ if [ "$#" -lt 2 ]; then
   exit 1
 fi
 
-TMP=$PWD/tmp/$1
+TMP=$TMP_DIR/$1
 DEST=$PATH_TO_OPENROAD_DEST/$1
 
 # Create a temp directory to build up the config  
@@ -18,21 +19,21 @@ mkdir -p $TMP
 
 # Copy over the design file (if it exists)
 if [ -f "$2" ]; then
-    cp -r $2 $TMP/
+    cp -r $2 $TMP
 else
     echo "Verilog file $1 does not exist!"
     # cleanup 
-    rm -rf $TMP
+    rm -rf $TMP_DIR
     exit 1
 fi
 
 # Check that we are running this from utils dir
 if [ -d "$PATH_TO_TEMPLATES" ]; then
-    cp $PATH_TO_TEMPLATES/* $TMP/
+    cp $PATH_TO_TEMPLATES/* $TMP
 else 
     echo "config_templates not found!"
     # cleanup
-    rm -rf $TMP
+    rm -rf $TMP_DIR
     exit 1
 fi
 
@@ -47,18 +48,18 @@ if [ -d "$PATH_TO_OPENROAD_DEST" ]; then
        cp $TMP/* $DEST/
     else
         echo "Destination $DEST already exists!"
-        rm -rf $TMP
+        rm -rf $TMP_DIR
         exit 1
     fi
 else
     echo "OpenROAD-flow-scripts not found!"
-    rm -rf $TMP
+    rm -rf $TMP_DIR
     exit 1
 fi
 
 # Delete the tmp
-rm -rf $TMP
+rm -rf $TMP_DIR
 
 # Report
-echo "Flow was successfully setup for $1 at $DEST"
+echo -e "Flow was successfully setup for $1 at:\n\t$PWD/$DEST"
 

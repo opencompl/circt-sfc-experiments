@@ -14,7 +14,7 @@ To add a new design, you need to create a folder under `OpenROAD-flow-scripts/fl
 ```sh
 BUILD # generic is reused verbatim for every design  
 config.mk # specific to design, must be regenerated  
-constraint.sdc # used for autotuning, also generic (although suboptimal)  
+constraint.sdc # used for autotuning, must be generated (currently suboptimal)  
 autotuner.json # autotuning params, can be left as is  
 $(DESIGN_NAME).v # the actual design file  
 ```  
@@ -27,9 +27,13 @@ cp -r example/fifo OpenROAD-flow-scripts/flow/design/sky130hd
   
 > NOTE: The entire process up until this point is automated using the [setup script](./utils/setup_flow.sh).  
   
+Before running openroad-flow-scripts make sure you tell it where your yosys and openroad binaries are:  
+```sh
+export OPENROAD_EXE=$(command -v openroad)
+export YOSYS_EXE=$(command -v yosys)
+```
 
-
-This can then be run through openroad using:  
+You can then run the flow for your design using:  
 ```sh  
 cd OpenROAD-flow-scripts/flow  
 make DESIGN_CONFIG=./designs/sky130hd/fifo/config.mk  
