@@ -25,6 +25,10 @@ To run the example copy the files into the sky130hd folder:
 cp -r example/fifo OpenROAD-flow-scripts/flow/design/sky130hd  
 ```  
   
+> NOTE: The entire process up until this point is automated using the [setup script](./utils/setup_flow.sh).  
+  
+
+
 This can then be run through openroad using:  
 ```sh  
 cd OpenROAD-flow-scripts/flow  
