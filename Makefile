@@ -21,13 +21,15 @@ benchmarks/sfc: $(SFC_DIRS)
 
 verilog: benchmarks/circt benchmarks/sfc
 	@for dir in $(CIRCT_DIRS); do \
-		find "$$dir" -name "*.fir" | while read fir; do \
+		bench_name=$$(basename "$$dir"); \
+		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
 			echo "Running firtool on $$fir..."; \
 			firtool "$$fir" -o "$${fir%.fir}.sv"; \
 		done; \
 	done
 	@for dir in $(SFC_DIRS); do \
-		find "$$dir" -name "*.fir" | while read fir; do \
+		bench_name=$$(basename "$$dir"); \
+		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
 			echo "Running firrtl on $$fir..."; \
 			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
 		done; \
@@ -44,14 +46,19 @@ benchmarks/circt/chipyard.harness.TestHarness.%: benchmarks/chipyard/chipyard.ha
 	@find $@ -name "*.fir" | while read f; do mv "$$f" "$$f.bak"; done
 	@find $@ -name "*.fir.bak" | while read fir_bak; do \
 		prefix="$${fir_bak%.fir.bak}"; \
-		echo "Running strip_annotations.py on $$prefix..."; \
-		python3 utils/strip_annotations.py "$$prefix"; \
+		if [ -f "$$prefix.anno.json.bak" ]; then \
+			echo "Running strip_annotations.py on $$prefix..."; \
+			python3 utils/strip_annotations.py "$$prefix"; \
+		else \
+			echo "Skipping strip_annotations.py on $$prefix (no anno.json), restoring fir..."; \
+			mv "$$fir_bak" "$$prefix.fir"; \
+		fi; \
 	done
 
 benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness.TestHarness.%
 	mkdir -p benchmarks/sfc
 	cp -r $< $@
-	@find $@ -name "*.fir" | while read f; do \
+	@find $@ -name "chipyard.harness.TestHarness.$*.fir" | while read f; do \
 		echo "Converting $$f..."; \
 		tmp=$$(mktemp); \
 		utils/convert_firrtl_2_to_1.sh "$$f" "$$tmp" && mv "$$tmp" "$$f"; \
