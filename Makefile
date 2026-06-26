@@ -48,7 +48,14 @@ verilog: benchmarks/circt benchmarks/sfc
 		bench_name=$$(basename "$$dir"); \
 		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
 			echo "Running firrtl on $$fir..."; \
-			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
+			fir_dir=$$(dirname "$$fir"); \
+			gen="$$fir_dir/gen-collateral"; \
+			mkdir -p "$$gen"; \
+			if firrtl -i "$$fir" -td "$$gen" -e verilog; then \
+				python3 utils/filter_reachable_modules.py "$$gen" ChipTop > "$${fir%.fir}.f"; \
+			else \
+				echo "Warning: SFC firrtl failed on $$bench_name, skipping ChipTop filelist"; \
+			fi; \
 		done; \
 	done
 
