@@ -8,7 +8,10 @@ CHIPYARD_DIRS := $(addprefix benchmarks/chipyard/chipyard.harness.TestHarness.,$
 CIRCT_DIRS := $(addprefix benchmarks/circt/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 
-.PHONY: all verilog clean check-tools
+DESIGN_PLATFORM ?= sky130hd
+OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
+
+.PHONY: all verilog openroad clean check-tools
 
 check-tools:
 	@utils/check_tools.sh
@@ -76,6 +79,24 @@ benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness
 		echo "Converting $$f..."; \
 		tmp=$$(mktemp); \
 		utils/convert_firrtl_2_to_1.sh "$$f" "$$tmp" && mv "$$tmp" "$$f"; \
+	done
+
+# Generate an OpenROAD-flow-scripts design (config.mk + constraint.sdc) for each
+# CIRCT benchmark, consuming the per-benchmark filelist produced by `verilog`.
+# Run `make verilog` (or `make`) first so the .f files exist.
+openroad:
+	@for name in $(BENCHMARK_NAMES); do \
+		f="benchmarks/circt/chipyard.harness.TestHarness.$$name/chipyard.harness.TestHarness.$$name.f"; \
+		if [ ! -s "$$f" ]; then \
+			echo "Skipping $$name: no filelist at $$f (run 'make verilog' first)"; \
+			continue; \
+		fi; \
+		if [ -d "$(OPENROAD_DESIGNS_DIR)/$$name" ]; then \
+			echo "Skipping $$name: design already exists at $(OPENROAD_DESIGNS_DIR)/$$name"; \
+			continue; \
+		fi; \
+		echo "Setting up OpenROAD flow for $$name..."; \
+		utils/setup_flow.sh "$$name" "$$f"; \
 	done
 
 clean:
