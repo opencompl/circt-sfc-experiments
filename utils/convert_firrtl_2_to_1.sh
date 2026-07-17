@@ -10,6 +10,6 @@ input="$1"
 output="$2"
 
 firtool --disable-annotation-unknown --parse-only "$input" \
-    | circt-translate --export-firrtl --firrtl-version=2.0.0 --target-line-length=40000 \
+    | circt-translate --export-firrtl --firrtl-version=2.0.0 --target-line-length=0 \
     | sed -e 's/FIRRTL version 2\.0\.0/FIRRTL version 1.2.0/' -e 's/`//g' \
     > "$output"
