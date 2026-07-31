@@ -48,3 +48,5 @@ report_tns
 report_worst_slack
 ```  
 
+
+Note: Chipyard benchmarks are generated from [this branch on my fork](https://github.com/TaoBi22/chipyard/tree/eval-configs).
