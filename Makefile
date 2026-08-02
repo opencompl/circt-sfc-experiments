@@ -22,7 +22,7 @@ benchmarks/chipyard: $(CHIPYARD_DIRS)
 benchmarks/circt: $(CIRCT_DIRS)
 benchmarks/sfc: $(SFC_DIRS)
 
-verilog: benchmarks/circt benchmarks/sfc
+verilog: benchmarks/circt benchmarks/sfc | tmp/
 	@for dir in $(CIRCT_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
 		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
@@ -31,7 +31,7 @@ verilog: benchmarks/circt benchmarks/sfc
 			gen="$$fir_dir/gen-collateral"; \
 			mkdir -p "$$gen"; \
 			fir_dir_abs=$$(cd "$$fir_dir" && pwd); \
-			anno_tmp=$$(mktemp --suffix=.json); \
+			anno_tmp=$$(mktemp -p ./tmp --suffix=.json); \
 			printf '[{"class":"sifive.enterprise.firrtl.MarkDUTAnnotation","target":"~TestHarness|ChipTop"},{"class":"sifive.enterprise.firrtl.ModuleHierarchyAnnotation","filename":"%s/top_module_hierarchy.json"}]' \
 			    "$$fir_dir_abs" > "$$anno_tmp"; \
 			lopts=""; \
@@ -72,12 +72,12 @@ benchmarks/circt/chipyard.harness.TestHarness.%: benchmarks/chipyard/chipyard.ha
 		fi; \
 	done
 
-benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness.TestHarness.%
+benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness.TestHarness.% | tmp/
 	mkdir -p benchmarks/sfc
 	cp -r $< $@
 	@find $@ -name "chipyard.harness.TestHarness.$*.fir" | while read f; do \
 		echo "Converting $$f..."; \
-		tmp=$$(mktemp); \
+		tmp=$$(mktemp -p ./tmp); \
 		utils/convert_firrtl_2_to_1.sh "$$f" "$$tmp" && mv "$$tmp" "$$f"; \
 	done
 
@@ -100,4 +100,7 @@ openroad:
 	done
 
 clean:
-	rm -rf benchmarks
+	rm -rf benchmarks tmp
+
+%/:
+	mkdir $@
