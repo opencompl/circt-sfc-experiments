@@ -99,8 +99,13 @@ openroad:
 		utils/setup_flow.sh "$$name" "$$f"; \
 	done
 
+# Delete all of the generated configs and benchmarks
 clean:
-	rm -rf benchmarks tmp
+	rm -rf benchmarks tmp	
+	@for name in $(BENCHMARK_NAMES); do \
+		echo "removed $(OPENROAD_DESIGNS_DIR)/$$name"; \
+		rm -rf $(OPENROAD_DESIGNS_DIR)/$$name; \
+	done
 
 %/:
 	mkdir $@

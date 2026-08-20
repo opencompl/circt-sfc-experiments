@@ -22,6 +22,8 @@ export CTS_CLUSTER_DIAMETER = 50
 
 export SWAP_ARITH_OPERATORS = 1
 export OPENROAD_HIERARCHICAL = 1
+
+export SYNTH_MEMORY_MAX_BITS = 1048576
 """
 
 # Single monolithic Verilog file (SFC-style output): one .v copied into the
