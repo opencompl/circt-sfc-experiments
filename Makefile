@@ -11,12 +11,12 @@ SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK
 DESIGN_PLATFORM ?= sky130hd
 OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
 
-.PHONY: all verilog openroad clean check-tools
+.PHONY: all verilog openroad-config clean check-tools
 
 check-tools:
 	@utils/check_tools.sh
 
-all: check-tools verilog
+all: check-tools verilog openroad-config
 
 benchmarks/chipyard: $(CHIPYARD_DIRS)
 benchmarks/circt: $(CIRCT_DIRS)
@@ -84,7 +84,7 @@ benchmarks/sfc/chipyard.harness.TestHarness.%: benchmarks/circt/chipyard.harness
 # Generate an OpenROAD-flow-scripts design (config.mk + constraint.sdc) for each
 # CIRCT benchmark, consuming the per-benchmark filelist produced by `verilog`.
 # Run `make verilog` (or `make`) first so the .f files exist.
-openroad:
+openroad-config:
 	@for name in $(BENCHMARK_NAMES); do \
 		f="benchmarks/circt/chipyard.harness.TestHarness.$$name/chipyard.harness.TestHarness.$$name.f"; \
 		if [ ! -s "$$f" ]; then \
@@ -97,7 +97,9 @@ openroad:
 		fi; \
 		echo "Setting up OpenROAD flow for $$name..."; \
 		utils/setup_flow.sh "$$name" "$$f"; \
-	done
+	done; \
+	export OPENROAD_EXE=$(command -v openroad); \
+	export YOSYS_EXE=$(command -v yosys)
 
 # Delete all of the generated configs and benchmarks
 clean:
