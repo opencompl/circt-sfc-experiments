@@ -3,7 +3,7 @@ set -euo pipefail
 
 ok=true
 
-for tool in firrtl firtool circt-translate; do
+for tool in firrtl firtool circt-translate yosys openroad; do
     if ! command -v "$tool" &>/dev/null; then
         echo "ERROR: $tool not found in PATH" >&2
         ok=false
