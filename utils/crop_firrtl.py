@@ -3,6 +3,7 @@ import sys
 # Removes all modules under a module called topModuleName
 # and writes results to a given filename
 def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
+    print(f"Cropping {filename} after module {topModuleName}...")
     lines: list[str] = []
     # Read in file and close file asap as it might be huge
     with open(filename, "r") as f:
@@ -37,6 +38,8 @@ def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
     with open(outputFile, "w") as out_f:
         out_f.writelines(lines)
 
+    print(f"Cropped result stored in {outputFile}")
+
 if __name__== "__main__":
     # Check that a file was given
     assert len(sys.argv) > 2, \
@@ -47,4 +50,4 @@ if __name__== "__main__":
     # check filename format
     assert filename.split('.')[-1] == "fir", "input file must be a firrtl file"
 
-    crop_file(filename, top_name, f"{filename.split('.')[0]}_cropped.fir")
+    crop_file(filename, top_name, f"{'.'.join(filename.split('.')[:-1])}_cropped.fir")

@@ -8,6 +8,8 @@ CHIPYARD_DIRS := $(addprefix benchmarks/chipyard/chipyard.harness.TestHarness.,$
 CIRCT_DIRS := $(addprefix benchmarks/circt/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK_NAMES))
 
+SFC_BENCH_BASE_DIR := benchmarks/sfc/
+
 DESIGN_PLATFORM ?= sky130hd
 OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
 
@@ -46,7 +48,8 @@ verilog: benchmarks/circt benchmarks/sfc | tmp/
 	done
 	@for dir in $(SFC_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
-		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
+		python3 utils/crop_firrtl.py "$$dir/$$bench_name.fir" "ChipTop"; \
+		find "$$dir" -name "$${bench_name}_cropped.fir" | while read fir; do \
 			echo "Running firrtl on $$fir..."; \
 			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
 		done; \
