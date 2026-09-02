@@ -11,7 +11,7 @@ SFC_DIRS := $(addprefix benchmarks/sfc/chipyard.harness.TestHarness.,$(BENCHMARK
 DESIGN_PLATFORM ?= sky130hd
 OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
 
-.PHONY: all verilog openroad-config clean check-tools
+.PHONY: all verilog openroad openroad-config clean-config clean-benchmarks clean check-tools
 
 check-tools:
 	@utils/check_tools.sh
@@ -101,13 +101,25 @@ openroad-config:
 	export OPENROAD_EXE=$(command -v openroad); \
 	export YOSYS_EXE=$(command -v yosys)
 
-# Delete all of the generated configs and benchmarks
-clean:
-	rm -rf benchmarks tmp	
+# Run openroad on each design
+openroad:
+	@for name in $(BENCHMARK_NAMES); do \
+		cd OpenROAD-flow-scripts/flow && $(MAKE) DESIGN_CONFIG=./designs/sky130hd/$$name/config.mk; \   
+	done
+
+# Only delete the configs.
+clean-config:
 	@for name in $(BENCHMARK_NAMES); do \
 		echo "removed $(OPENROAD_DESIGNS_DIR)/$$name"; \
 		rm -rf $(OPENROAD_DESIGNS_DIR)/$$name; \
 	done
+
+# Only delete the benchmarks
+clean-benchmarks:
+	rm -rf benchmarks tmp
+
+# Delete all of the generated configs and benchmarks
+clean: clean-benchmarks clean-config
 
 %/:
 	mkdir $@
