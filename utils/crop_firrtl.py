@@ -3,10 +3,10 @@ import sys
 # Removes all modules under a module called topModuleName
 # and writes results to a given filename
 def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
-    lines = []
+    lines: list[str] = []
     # Read in file and close file asap as it might be huge
     with open(filename, "r") as f:
-        lines: list[str] = f.readlines() # NOTE: This might explode if file is too large
+        lines = f.readlines() # NOTE: This might explode if file is too large
 
     # get all the module lines in the file
     modules: list[str] = [m for m in lines if "module" in m]
@@ -17,9 +17,15 @@ def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
     # Make sure we found chiptop
     assert chiptop is not None, f"Module {topModuleName} not found!"
 
+    # find which module comes after chiptop
+    nextModuleIndex: int = modules.index(chiptop) + 1
+
+    # Make sure such a module exists
+    assert len(modules) > nextModuleIndex, "No modules after ChipTop to crop!"
+
     # our targeted end of file will be the line before the 
     # module that comes after chiptop, assuming no nested modules (otherwise fml)
-    target_eof: int = lines.index(modules[modules.index(chiptop) + 1]) - 1
+    target_eof: int = lines.index(modules[nextModuleIndex]) - 1
 
     # Crop our old lines list
     lines = lines[:target_eof]
