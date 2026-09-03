@@ -1,6 +1,14 @@
 # SFC vs. CIRCT FIRRTL compilation benchmarking (WIP)
 
-Run `make verilog` to generate a benchmark directory containing Verilog generated from the supported Chipyard benchmarks by both Firtool and SFC.
+- Run `make verilog` to generate a benchmark directory containing Verilog generated from the supported Chipyard benchmarks by both Firtool and SFC.  
+- Run `make openroad-config` to setup the OpenroadFlowScripts.  
+- Finally, run `make openroad` to synthesize all designs, or for a single design:  
+```sh
+cd OpenROAD-flow-scripts/flow  
+make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk  
+make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk gui_final
+```
+Where `DESING_NAME` is one of: `GemminiRocketConfig`, `LargeBoomV4Config`, `MediumBoomV4Config`, `MegaBoomV4Config`, or `SmallBoomV4Config`.
 
 ## Requirements
 - [firrtl2 v6.0.0](https://github.com/ucb-bar/firrtl2/releases)
@@ -9,7 +17,8 @@ Run `make verilog` to generate a benchmark directory containing Verilog generate
 - Basic things like Python3 and GNU-make
 
 ## TODO
-- All designs crash on ABC after a few hours...
+- All designs crash on ABC after a few hours... [#6](https://github.com/opencompl/circt-sfc-experiments/issues/6)
+- Integrate SFC designs with openroad flow.
 
 ## Integrating OpenROAD  
 > NOTE: The entire openroad config setup can be run using `make openroad-config`.
