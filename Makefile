@@ -13,7 +13,7 @@ SFC_BENCH_BASE_DIR := benchmarks/sfc/
 DESIGN_PLATFORM ?= sky130hd
 OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
 
-.PHONY: all verilog verilog-mfc verilog-sfc openroad openroad-config clean-config clean-benchmarks clean check-tools
+.PHONY: all verilog verilog-mfc verilog-sfc openroad openroad-config openroad-config-sfc clean-config clean-benchmarks clean check-tools
 
 check-tools:
 	@utils/check_tools.sh
@@ -116,6 +116,23 @@ openroad-config:
 	export OPENROAD_EXE=$(command -v openroad); \
 	export YOSYS_EXE=$(command -v yosys)
 
+# Same, for the SFC benchmarks. Nicknamed <name>-sfc so both compilers' designs
+# can sit side by side under the platform's designs directory.
+openroad-config-sfc:
+	@for name in $(BENCHMARK_NAMES); do \
+		f="benchmarks/sfc/chipyard.harness.TestHarness.$$name/chipyard.harness.TestHarness.$${name}_cropped.f"; \
+		if [ ! -s "$$f" ]; then \
+			echo "Skipping $$name: no filelist at $$f (run 'make verilog-sfc' first)"; \
+			continue; \
+		fi; \
+		if [ -d "$(OPENROAD_DESIGNS_DIR)/$$name-sfc" ]; then \
+			echo "Skipping $$name: design already exists at $(OPENROAD_DESIGNS_DIR)/$$name-sfc"; \
+			continue; \
+		fi; \
+		echo "Setting up OpenROAD flow for $$name-sfc..."; \
+		utils/setup_flow.sh "$$name-sfc" "$$f"; \
+	done
+
 # Run openroad on each design
 openroad:
 	@for name in $(BENCHMARK_NAMES); do \
@@ -125,8 +142,10 @@ openroad:
 # Only delete the configs.
 clean-config:
 	@for name in $(BENCHMARK_NAMES); do \
-		echo "removed $(OPENROAD_DESIGNS_DIR)/$$name"; \
-		rm -rf $(OPENROAD_DESIGNS_DIR)/$$name; \
+		for design in "$$name" "$$name-sfc"; do \
+			echo "removed $(OPENROAD_DESIGNS_DIR)/$$design"; \
+			rm -rf $(OPENROAD_DESIGNS_DIR)/$$design; \
+		done; \
 	done
 
 # Only delete the benchmarks
