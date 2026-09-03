@@ -8,7 +8,7 @@ cd OpenROAD-flow-scripts/flow
 make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk  
 make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk gui_final
 ```
-Where `DESING_NAME` is one of: `GemminiRocketConfig`, `LargeBoomV4Config`, `MediumBoomV4Config`, `MegaBoomV4Config`, or `SmallBoomV4Config`.
+Where `DESIGN_NAME` is one of: `GemminiRocketConfig`, `LargeBoomV4Config`, `MediumBoomV4Config`, `MegaBoomV4Config`, or `SmallBoomV4Config`.
 
 ## Requirements
 - [firrtl2 v6.0.0](https://github.com/ucb-bar/firrtl2/releases)
