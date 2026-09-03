@@ -11,8 +11,8 @@ make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk gui_final
 Where `DESIGN_NAME` is one of: `GemminiRocketConfig`, `LargeBoomV4Config`, `MediumBoomV4Config`, `MegaBoomV4Config`, or `SmallBoomV4Config`.
 
 ## Requirements
-- [firrtl2 v6.0.0](https://github.com/ucb-bar/firrtl2/releases)
-- A recent CIRCT build with: [`firtool`,  `circt-translate`](https://github.com/llvm/circt/releases)
+- [firrtl2 v6.0.0](https://github.com/ucb-bar/firrtl2/releases),  also available for nix through [my fork of nixpkgs under "firrtl2"](https://github.com/dobios/nixpkgs/tree/firrtl2-pkg)
+- A recent CIRCT build with: [`firtool`,  `circt-translate`](https://github.com/llvm/circt/releases) also available for [nix](https://github.com/dtzSiFive/circt-nix)
 - Recent verisons of [`yosys`, `openroad`, `klayout`, (all part of the oss-cad-suite)](https://github.com/YosysHQ/oss-cad-suite-build/releases)
 - Basic things like Python3 and GNU-make
 
