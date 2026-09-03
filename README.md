@@ -2,7 +2,13 @@
 
 Run `make verilog` to generate a benchmark directory containing Verilog generated from the supported Chipyard benchmarks by both Firtool and SFC.
 
-TODO:
+## Requirements
+- [firrtl2 v6.0.0](https://github.com/ucb-bar/firrtl2/releases)
+- A recent CIRCT build with: [`firtool`,  `circt-translate`](https://github.com/llvm/circt/releases)
+- Recent verisons of [`yosys`, `openroad`, `klayout`, (all part of the oss-cad-suite)](https://github.com/YosysHQ/oss-cad-suite-build/releases)
+- Basic things like Python3 and GNU-make
+
+## TODO
 - All designs crash on ABC after a few hours...
 
 ## Integrating OpenROAD  
