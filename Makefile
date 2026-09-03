@@ -47,14 +47,22 @@ verilog-mfc: benchmarks/circt benchmarks/sfc | tmp/
 		done; \
 	done
 
+
+# We need to get blackbox collateral definitions out of annotations - we can do
+# this with the -faf flag of SFC, but there's some cruft (newer annotations etc.)
+# that we don't want to keep in, so blackbox_annos.py strips it
 verilog-sfc: benchmarks/circt benchmarks/sfc | tmp/
-	@for dir in $(SFC_DIRS); do \
+	@set -e; for dir in $(SFC_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
 		python3 utils/crop_firrtl.py "$$dir/$$bench_name.fir" "ChipTop"; \
-		find "$$dir" -name "$${bench_name}_cropped.fir" | while read fir; do \
-			echo "Running firrtl on $$fir..."; \
-			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
-		done; \
+		fir="$$dir/$${bench_name}_cropped.fir"; \
+		gen="$$dir/sfc-collateral"; \
+		python3 utils/blackbox_annos.py "$$dir/$$bench_name.anno.json" \
+		    "$$fir" TestHarness ChipTop > "tmp/$$bench_name.bb.json"; \
+		echo "Running firrtl on $$fir..."; \
+		firrtl -i "$$fir" -o "$$PWD/$${fir%.fir}.v" -X verilog -td "$$gen" \
+		    -faf "tmp/$$bench_name.bb.json" --allow-unrecognized-annotations; \
+		{ echo "$${fir%.fir}.v"; ls "$$gen"/*.v; } > "$${fir%.fir}.f"; \
 	done
 
 verilog: verilog-mfc verilog-sfc
