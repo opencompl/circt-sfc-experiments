@@ -1,5 +1,26 @@
 import sys
 
+# Rename a given circuit annotation using a given topModuleName
+# Skips if the topModuleName is already the circuit name
+# Returns the renamed circuit annotation.
+def rename_circuit(topModuleName: str, circuit_anno: str) -> str:
+    # Extract the current top_module name
+    tokenize_anno: list[str] = circuit_anno.split(' ')
+    top_name_idx: int = tokenize_anno.index('circuit') + 1
+
+    # Sanity check, our circuit annotation is well formed
+    assert len(tokenize_anno) > top_name_idx, "Malformed circuit annotation"
+
+    # Extract the name and check if it needs to be changed
+    name: str = tokenize_anno[top_name_idx]
+    if name == topModuleName:
+        return circuit_anno
+
+    # Update the annotation since the name is changing
+    tokenize_anno[top_name_idx] = topModuleName
+
+    return ' '.join(tokenize_anno)
+
 # Removes all modules under a module called topModuleName
 # and writes results to a given filename
 def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
@@ -30,6 +51,19 @@ def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
 
     # Crop our old lines list
     lines = lines[:target_eof]
+
+    # Find and rename the circuit annotation to match the top module
+    circuit_anno: str = next((c for c in lines if "circuit" in c), "")
+    assert circuit_anno != "", "Missing circuit annotation"
+
+    new_circuit_anno: str = rename_circuit(topModuleName, circuit_anno)
+
+    # Check that our circuit annotation is well in our file
+    circuit_anno_idx = lines.index(circuit_anno)
+    assert len(lines) > circuit_anno_idx, "Circuit annotation was found out of bounds!"
+
+    # Update our circuit annotation 
+    lines[lines.index(circuit_anno)] = new_circuit_anno
 
     # Make sure we didn't just wipe our file
     assert len(lines) > 0, "Error: File was wiped!"

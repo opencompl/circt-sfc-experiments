@@ -1,10 +1,10 @@
 with (import <nixpkgs> {});
 mkShell {
   buildInputs = [
-      gnumake
+    gnumake
     openroad
     klayout
-    firrtl
+    python3
   ];
 }
 
