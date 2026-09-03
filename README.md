@@ -52,4 +52,3 @@ report_worst_slack
 Note: 
 - Chipyard benchmarks are generated from [this branch on my fork](https://github.com/TaoBi22/chipyard/tree/eval-configs).
 - OpenRoadFlowScripts can be found on [this branch of our other fork](https://github.com/dobios/OpenROAD-flow-scripts/tree/372d225d5fd8232f255c4bbcfece19a1ff7b12bd)
-- 
