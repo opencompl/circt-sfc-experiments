@@ -13,7 +13,7 @@ SFC_BENCH_BASE_DIR := benchmarks/sfc/
 DESIGN_PLATFORM ?= sky130hd
 OPENROAD_DESIGNS_DIR := OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)
 
-.PHONY: all verilog openroad openroad-config clean-config clean-benchmarks clean check-tools
+.PHONY: all verilog verilog-mfc verilog-sfc openroad openroad-config clean-config clean-benchmarks clean check-tools
 
 check-tools:
 	@utils/check_tools.sh
@@ -24,7 +24,7 @@ benchmarks/chipyard: $(CHIPYARD_DIRS)
 benchmarks/circt: $(CIRCT_DIRS)
 benchmarks/sfc: $(SFC_DIRS)
 
-verilog: benchmarks/circt benchmarks/sfc | tmp/
+verilog-mfc: benchmarks/circt benchmarks/sfc | tmp/
 	@for dir in $(CIRCT_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
 		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
@@ -46,6 +46,8 @@ verilog: benchmarks/circt benchmarks/sfc | tmp/
 			    > "$${fir%.fir}.f"; \
 		done; \
 	done
+
+verilog-sfc: benchmarks/circt benchmarks/sfc | tmp/
 	@for dir in $(SFC_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
 		python3 utils/crop_firrtl.py "$$dir/$$bench_name.fir" "ChipTop"; \
@@ -54,6 +56,8 @@ verilog: benchmarks/circt benchmarks/sfc | tmp/
 			firrtl -i "$$fir" -o "$${fir%.fir}.v" -X verilog; \
 		done; \
 	done
+
+verilog: verilog-mfc verilog-sfc
 
 benchmarks/chipyard/chipyard.harness.TestHarness.%: chipyard_tars/%.tar.gz
 	mkdir -p benchmarks/chipyard
