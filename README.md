@@ -6,6 +6,7 @@ TODO:
 - All designs crash on ABC after a few hours...
 
 ## Integrating OpenROAD  
+> NOTE: The entire openroad config setup can be run using `make openroad-config`.
 
 For the openroad integration, we rely on OpenROAD-flow-scripts.  
 To add a new design, you need to create a folder under `OpenROAD-flow-scripts/flow/designs/$(DESIGN_PLATFORM)` with the name of your design and fill it with the following:
@@ -35,8 +36,8 @@ export YOSYS_EXE=$(command -v yosys)
 You can then run the flow for your design using:  
 ```sh  
 cd OpenROAD-flow-scripts/flow  
-make DESIGN_CONFIG=./designs/sky130hd/fifo/config.mk  
-make DESIGN_CONFIG=./designs/sky130hd/fifo/config.mk gui_final
+make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk  
+make DESIGN_CONFIG=./designs/sky130hd/<DESIGN_NAME>/config.mk gui_final
 ```  
 Then in the tcl command box, run commands to get the QoR reports:  
 ```tcl  
@@ -46,6 +47,9 @@ report_wns
 report_tns
 report_worst_slack
 ```  
+> NOTE: The entire openroad process for all designs can be launched using `make openroad`.
 
-
-Note: Chipyard benchmarks are generated from [this branch on my fork](https://github.com/TaoBi22/chipyard/tree/eval-configs).
+Note: 
+- Chipyard benchmarks are generated from [this branch on my fork](https://github.com/TaoBi22/chipyard/tree/eval-configs).
+- OpenRoadFlowScripts can be found on [this branch of our other fork](https://github.com/dobios/OpenROAD-flow-scripts/tree/372d225d5fd8232f255c4bbcfece19a1ff7b12bd)
+- 
