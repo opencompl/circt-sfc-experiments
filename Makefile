@@ -38,7 +38,7 @@ verilog-mfc: benchmarks/circt benchmarks/sfc | tmp/
 			    "$$fir_dir_abs" > "$$anno_tmp"; \
 			lopts=""; \
 			[ -f "$$fir_dir/.mfc_lowering_options" ] && lopts="--lowering-options=$$(cat "$$fir_dir/.mfc_lowering_options")"; \
-			firtool --split-verilog --export-module-hierarchy -o "$$gen" $$lopts --annotation-file "$$anno_tmp" "$$fir"; \
+			firtool --split-verilog --export-module-hierarchy --default-layer-specialization=disable -o "$$gen" $$lopts --annotation-file "$$anno_tmp" "$$fir"; \
 			rm -f "$$anno_tmp"; \
 			python3 utils/filter_chiptop_files.py \
 			    "$$fir_dir/top_module_hierarchy.json" \
