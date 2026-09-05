@@ -77,11 +77,18 @@ def crop_file(filename: str, topModuleName: str, outputFile: str) -> None:
 if __name__== "__main__":
     # Check that a file was given
     assert len(sys.argv) > 2, \
-        "Usage: python crop_firrtl.py <chipyard_firrtl_file>.fir <topModuleName>"
+        "Usage: python crop_firrtl.py <chipyard_firrtl_file>.fir <topModuleName> [inplace=0, 1]?"
     filename: str = sys.argv[1]
     top_name: str = sys.argv[2]
+    inplace: bool = False
+
+    if len(sys.argv) > 3:
+        inplace = bool(int(sys.argv[3]))
 
     # check filename format
     assert filename.split('.')[-1] == "fir", "input file must be a firrtl file"
 
-    crop_file(filename, top_name, f"{'.'.join(filename.split('.')[:-1])}_cropped.fir")
+    crop_file( \
+        filename, top_name,  \
+        filename if inplace else f"{'.'.join(filename.split('.')[:-1])}_cropped.fir" \
+    ) 
