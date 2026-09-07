@@ -28,13 +28,14 @@ verilog-mfc: benchmarks/circt benchmarks/sfc | tmp/
 	@for dir in $(CIRCT_DIRS); do \
 		bench_name=$$(basename "$$dir"); \
 		find "$$dir" -name "$$bench_name.fir" | while read fir; do \
+			python3 utils/crop_firrtl.py "$$fir" "ChipTop" 1; \
 			echo "Running firtool on $$fir..."; \
 			fir_dir=$$(dirname "$$fir"); \
 			gen="$$fir_dir/gen-collateral"; \
 			mkdir -p "$$gen"; \
 			fir_dir_abs=$$(cd "$$fir_dir" && pwd); \
 			anno_tmp=$$(mktemp -p ./tmp --suffix=.json); \
-			printf '[{"class":"sifive.enterprise.firrtl.MarkDUTAnnotation","target":"~TestHarness|ChipTop"},{"class":"sifive.enterprise.firrtl.ModuleHierarchyAnnotation","filename":"%s/top_module_hierarchy.json"}]' \
+			printf '[{"class":"sifive.enterprise.firrtl.MarkDUTAnnotation","target":"~ChipTop|ChipTop"},{"class":"sifive.enterprise.firrtl.ModuleHierarchyAnnotation","filename":"%s/top_module_hierarchy.json"}]' \
 			    "$$fir_dir_abs" > "$$anno_tmp"; \
 			lopts=""; \
 			[ -f "$$fir_dir/.mfc_lowering_options" ] && lopts="--lowering-options=$$(cat "$$fir_dir/.mfc_lowering_options")"; \
